@@ -1,0 +1,15 @@
+{
+  "name": "@zypher/deno",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "deno task dev",
+    "start": "deno task start",
+    "clean": "rm -rf zypher-workspace"
+  },
+  "dependencies": {
+    "rxjs-for-await": "^1.0.0"
+  }
+}
+

@@ -1,0 +1,84 @@
+# Dockerfile for Next.js Web Application
+FROM node:20-slim AS base
+
+# Install OpenSSL and other required libraries
+RUN apt-get update && apt-get install -y \
+    openssl \
+    libssl3 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Set working directory
+WORKDIR /app
+
+# Copy workspace files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json ./apps/web/package.json
+
+# Install dependencies
+FROM base AS deps
+RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY apps/web ./apps/web
+
+WORKDIR /app/apps/web
+
+# Generate Prisma client
+RUN pnpm prisma generate
+
+# Build the application
+RUN pnpm build
+
+# Production stage
+FROM node:20-slim AS runner
+
+# Install OpenSSL and required libraries for runtime (including onnxruntime dependencies)
+RUN apt-get update && apt-get install -y \
+    openssl \
+    libssl3 \
+    ca-certificates \
+    libgomp1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Copy package files first
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json ./apps/web/package.json
+
+# Install all dependencies (including Prisma)
+RUN pnpm install --frozen-lockfile
+
+# Copy Prisma schema and generate client
+COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
+WORKDIR /app/apps/web
+RUN pnpm prisma generate
+WORKDIR /app
+
+# Copy necessary files from builder
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE 3000
+
+# Create startup script that runs migrations then starts the app  
+RUN echo '#!/bin/sh\nset -e\necho "Starting migrations..."\ncd /app/apps/web\necho "Current directory: $(pwd)"\necho "Checking if migrations exist:"\nls -la prisma/migrations/ || echo "No migrations found"\necho "Running Prisma migrate deploy..."\npnpm prisma migrate deploy\necho "Migrations complete!"\ncd /app\necho "Starting server..."\nexec node apps/web/server.js' > /app/start.sh && chmod +x /app/start.sh
+
+# Start the application with migrations
+CMD ["/app/start.sh"]
+

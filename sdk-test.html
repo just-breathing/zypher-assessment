@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zypher SDK Test - External Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        code {
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Zypher Chatbot SDK Test</h1>
+    
+    <div class="info">
+        <h2>Test Information</h2>
+        <p><strong>This page:</strong> Running on a different port/domain</p>
+        <p><strong>Chatbot source:</strong> http://localhost:3000</p>
+        <p><strong>Status:</strong> The chatbot should load below ⬇️</p>
+    </div>
+
+    <div class="instructions">
+        <h3>📝 How to use the SDK in your application:</h3>
+        <ol>
+            <li>Add the script tag with your agent ID and API key</li>
+            <li>Point the <code>src</code> to your Zypher instance (e.g., http://localhost:3000/sdk/chatbot.js)</li>
+            <li>The chatbot will automatically load and render on your page!</li>
+        </ol>
+        <pre><code>&lt;script 
+  src="http://localhost:3000/sdk/chatbot.js"
+  data-agent-id="YOUR_AGENT_ID"
+  data-api-key="YOUR_API_KEY"
+&gt;&lt;/script&gt;</code></pre>
+    </div>
+
+    <!-- 
+    Replace YOUR_AGENT_ID and YOUR_API_KEY with actual values from your Zypher dashboard
+    -->
+    <script 
+        src="http://localhost:3000/sdk/chatbot.js"
+        data-agent-id="YOUR_AGENT_ID"
+        data-api-key="YOUR_API_KEY"
+    ></script>
+
+    <div style="margin-top: 40px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107;">
+        <strong>⚠️ Note:</strong> Replace <code>YOUR_AGENT_ID</code> and <code>YOUR_API_KEY</code> in the script tag above with your actual values from the Zypher dashboard.
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,23 @@
+# Dockerfile for Deno Backend
+FROM denoland/deno:alpine-2.1.4
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Copy Deno application files
+COPY apps/deno/ .
+
+# Remove old lockfile if it exists and cache dependencies
+RUN rm -f deno.lock && \
+    deno cache --reload main.ts
+
+# Set environment variables
+ENV PORT=3001
+
+EXPOSE 3001
+
+# Start the Deno server
+CMD ["deno", "run", "--allow-net", "--allow-read", "--allow-write", "--allow-env", "--allow-sys", "main.ts"]
+
